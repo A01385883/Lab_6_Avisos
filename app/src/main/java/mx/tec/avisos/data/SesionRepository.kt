@@ -40,7 +40,7 @@ class SesionRepository(private val api: AvisosApi) {
     suspend fun salir() {
         _sesion.value = null
     }
-
+    //Igualmente era un checkpoint, nomas añado esto para que me deje hacer commit
     /** Para la capa de red, que corre en su propio hilo y no puede suspender. */
     fun tokenActual(): String? = _sesion.value?.accessToken
 }
