@@ -5,6 +5,7 @@ import androidx.lifecycle.viewmodel.CreationExtras
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import mx.tec.avisos.AvisosApplication
+import mx.tec.avisos.data.SesionRepository
 
 /**
  * Cómo se construye cada ViewModel de la app. Igual que en la Práctica 5: los
@@ -15,7 +16,9 @@ object AppViewModelProvider {
 
     val Factory = viewModelFactory {
 
-        initializer { LoginViewModel() }
+        initializer { SesionViewModel(avisosApplication().container.sesionRepository) }
+
+        initializer { LoginViewModel(avisosApplication().container.sesionRepository) }
 
         initializer { AvisosViewModel(avisosApplication().container.avisosRepository) }
 

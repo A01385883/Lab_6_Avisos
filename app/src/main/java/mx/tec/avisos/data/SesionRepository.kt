@@ -7,6 +7,7 @@ import mx.tec.avisos.data.remote.Credenciales
 import mx.tec.avisos.data.remote.toSesion
 import mx.tec.avisos.domain.Sesion
 
+
 /**
  * La única puerta a la sesión. Hacia arriba habla de `Sesion`; hacia abajo,
  * del servidor.
