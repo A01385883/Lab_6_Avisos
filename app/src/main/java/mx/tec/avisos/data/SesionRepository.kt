@@ -35,7 +35,7 @@ class SesionRepository(private val api: AvisosApi, private val store: SesionStor
         )
         store.guardar(api.register(credenciales).toSesion())
     }
-
+    // No se porque pero no me dio el texto que queria en el commit, otro comentario random
     /** Primero se borra lo local: aunque no haya red, salir siempre funciona. */
     suspend fun salir() {
         val actual = store.sesion.first()
