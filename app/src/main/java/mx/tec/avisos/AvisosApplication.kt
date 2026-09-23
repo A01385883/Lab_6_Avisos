@@ -8,6 +8,7 @@ import mx.tec.avisos.data.local.SesionStore
 import mx.tec.avisos.data.remote.AuthInterceptor
 import mx.tec.avisos.data.remote.AvisosApi
 import mx.tec.avisos.data.remote.Network
+import mx.tec.avisos.data.local.Cifrador
 
 /**
  * El contenedor de dependencias: quién construye a quién, en un solo lugar.
@@ -19,7 +20,7 @@ import mx.tec.avisos.data.remote.Network
  */
 class AppContainer(context: Context) {
 
-    private val sesionStore = SesionStore(context)
+    private val sesionStore = SesionStore(context, Cifrador())
 
     private val api: AvisosApi by lazy {
         Network.crearApi(interceptor = AuthInterceptor { sesionRepository.tokenActual() })
