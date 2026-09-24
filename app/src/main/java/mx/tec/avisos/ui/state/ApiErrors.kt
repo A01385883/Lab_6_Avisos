@@ -19,6 +19,7 @@ fun mensajeDe(e: HttpException): String {
     return when (e.code()) {
         401 -> mensaje ?: "Tu sesión no es válida. Vuelve a entrar."
         403 -> mensaje ?: "No tienes permiso para hacer eso."
+        404 -> mensaje ?: "No se encontró. Puede que ya lo hayan borrado."
         409 -> mensaje ?: "Ese usuario ya existe."
         422 -> mensaje ?: "Los datos no son válidos."
         else -> "El servidor respondió ${e.code()}."

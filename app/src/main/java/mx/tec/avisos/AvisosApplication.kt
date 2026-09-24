@@ -25,7 +25,10 @@ class AppContainer(context: Context) {
 
     private val api: AvisosApi by lazy {
         Network.crearApi(
-            interceptor = AuthInterceptor { sesionRepository.tokenActual() },
+            interceptor = AuthInterceptor(
+                tokenVigente = { sesionRepository.tokenVigente() },
+                tokenActual = { sesionRepository.tokenActual() }
+            ),
             authenticator = TokenAuthenticator(
                 tokenActual = { sesionRepository.tokenActual() },
                 refrescar = { sesionRepository.refrescarToken() }
@@ -38,7 +41,6 @@ class AppContainer(context: Context) {
     val avisosRepository: AvisosRepository by lazy { AvisosRepository(api) }
 }
 
-/** Vive tanto como el proceso. Declarada en el manifiesto con `android:name`. */
 class AvisosApplication : Application() {
 
     lateinit var container: AppContainer

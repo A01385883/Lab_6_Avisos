@@ -30,5 +30,6 @@ data class Sesion(
 ) {
     /** La regla de autorización, vista desde el cliente. El servidor la repite. */
     val puedePublicar: Boolean get() = rol == Rol.PROFESOR
+    val puedeBorrar: Boolean get() = rol == Rol.PROFESOR
     fun segundosRestantes(ahora: Long = System.currentTimeMillis() / 1000): Long = expiraEn - ahora
 }

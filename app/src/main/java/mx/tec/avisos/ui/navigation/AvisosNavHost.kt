@@ -30,8 +30,11 @@ fun AvisosNavHost(sesion: Sesion, onSalir: () -> Unit) {
             AvisosScreen(
                 sesion = sesion,
                 avisos = viewModel.avisos,
+                mensaje = viewModel.mensaje,
                 onRecargar = { viewModel.cargar() },
                 onPublicar = { nav.navigate(Route.PUBLICAR) },
+                onBorrar = viewModel::borrar,
+                onMensajeMostrado = viewModel::mensajeMostrado,
                 onSalir = onSalir
             )
         }

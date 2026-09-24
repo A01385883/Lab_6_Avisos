@@ -23,6 +23,14 @@ class SesionRepository(private val api: AvisosApi, private val store: SesionStor
 
     val sesion: Flow<Sesion?> = store.sesion
 
+    /**
+     * Una sola renovación a la vez, la pida quien la pida (el interceptor por
+     * anticipado o el authenticator tras un 401). Si el servidor rota el
+     * refresh token, dos renovaciones en paralelo harían que la segunda usara
+     * uno ya invalidado, recibiera 401 y borrara la sesión.
+     */
+    private val candado = Any()
+
     suspend fun entrar(usuario: String, password: String) {
         store.guardar(api.login(Credenciales(usuario.trim().lowercase(), password)).toSesion())
     }
@@ -50,7 +58,7 @@ class SesionRepository(private val api: AvisosApi, private val store: SesionStor
             }
         }
     }
-    fun refrescarToken(): String? = runBlocking { refrescar() }
+    fun refrescarToken(): String? = synchronized(candado) { runBlocking { refrescar() } }
 
     /**
      * Cambia el refresh token por un par nuevo. Si el servidor dice que ese
@@ -72,5 +80,27 @@ class SesionRepository(private val api: AvisosApi, private val store: SesionStor
         }
     }
     /** Para la capa de red, que corre en su propio hilo y no puede suspender. */
-    fun tokenActual(): String? = runBlocking { store.sesion.first() }?.accessToken
+    fun tokenActual(): String? = leerSesion()?.accessToken
+    fun tokenVigente(): String? {
+        // Camino rápido, sin candado: casi siempre el token todavía sirve.
+        val primera = leerSesion() ?: return null
+        if (primera.segundosRestantes() >= MARGEN_SEGUNDOS) return primera.accessToken
+
+        return synchronized(candado) {
+            // Se vuelve a mirar dentro: otro hilo pudo renovar mientras esperábamos.
+            val sesion = leerSesion()
+            when {
+                sesion == null -> null
+                sesion.segundosRestantes() >= MARGEN_SEGUNDOS -> sesion.accessToken
+                else -> refrescarToken() ?: leerSesion()?.accessToken
+            }
+        }
+    }
+
+    private fun leerSesion(): Sesion? = runBlocking { store.sesion.first() }
+
+    private companion object {
+        /** Con menos segundos que estos, el access se renueva antes de usarse. */
+        const val MARGEN_SEGUNDOS = 30L
+    }
 }

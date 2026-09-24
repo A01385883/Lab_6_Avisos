@@ -4,6 +4,7 @@ import mx.tec.avisos.data.remote.AvisosApi
 import mx.tec.avisos.data.remote.NuevoAvisoBody
 import mx.tec.avisos.data.remote.toDomain
 import mx.tec.avisos.domain.Aviso
+import retrofit2.HttpException
 
 /**
  * El tablón. No sabe nada de tokens: el interceptor firma las peticiones por
@@ -15,4 +16,9 @@ class AvisosRepository(private val api: AvisosApi) {
 
     suspend fun publicar(titulo: String, cuerpo: String): Aviso =
         api.crearAviso(NuevoAvisoBody(titulo.trim(), cuerpo.trim())).toDomain()
+
+    suspend fun borrar(id: Int) {
+        val respuesta = api.borrarAviso(id)
+        if (!respuesta.isSuccessful) throw HttpException(respuesta)
+    }
 }
